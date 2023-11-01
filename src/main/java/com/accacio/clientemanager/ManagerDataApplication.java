@@ -35,15 +35,15 @@ public class ManagerDataApplication {
 		File[] arquivos = pastaExcel.listFiles((dir, name) -> name.endsWith(".xlsx"));
 
 		if (arquivos != null) {
+			ObjectMapper objectMapper = new ObjectMapper();
+			ObjectNode rootNode = objectMapper.createObjectNode();
+
 			for (File arquivo : arquivos) {
 				try {
 					FileInputStream excelFile = new FileInputStream(arquivo);
 					Workbook workbook = new XSSFWorkbook(excelFile);
 					Sheet sheet = workbook.getSheetAt(0);
 					Iterator<Row> iterator = sheet.iterator();
-
-					ObjectMapper objectMapper = new ObjectMapper();
-					ObjectNode rootNode = objectMapper.createObjectNode();
 
 					while (iterator.hasNext()) {
 						Row currentRow = iterator.next();
@@ -67,15 +67,19 @@ public class ManagerDataApplication {
 
 					workbook.close();
 
-					String nomeArquivoJson = arquivo.getName().replace(".xlsx", ".json");
-					objectMapper.writeValue(new File(nomeArquivoJson), rootNode);
-
-					System.out.println("JSON salvo com sucesso: " + nomeArquivoJson);
-
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
+
+			try {
+				String nomeArquivoJson = "unificado.json"; // Nome do arquivo JSON unificado
+				objectMapper.writeValue(new File(nomeArquivoJson), rootNode);
+				System.out.println("JSON unificado salvo com sucesso: " + nomeArquivoJson);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
+
 }
